@@ -56,7 +56,7 @@ def remove_columns(df:pd.DataFrame, thresh:float = 0.7) -> pd.DataFrame:
                  'collection_recovery_fee', 'last_pymnt_amnt', 'last_credit_pull_d',
                  'last_fico_range_high', 'last_fico_range_low']
     extra_columns_to_remove = [col for col in df.columns if col.startswith("hardship") or "settlement" in col] + \
-            ["id", "emp_title", "issue_d", "url", "title", "zip_code", "policy_code", "earliest_cr_line"]
+            ["id", "emp_title", "url", "title", "zip_code", "policy_code", "earliest_cr_line"]
     df = df.drop(columns = missing_cols + lf_columns + extra_columns_to_remove)
     return df
 
@@ -71,7 +71,7 @@ def map_categorical_variables(df:pd.DataFrame, state_to_region_map:dict,
     return df
 
 def modify_target_binary(df:pd.DataFrame, target:str) -> pd.Series:
-    df = df.loc[~df[target].isin(["Current","Issued"])].copy()
+    
     good_statuses = ["Fully Paid",
                    'Does not meet the credit policy. Status:Fully Paid']
     df[target] = df[target].isin(good_statuses).astype(int)
@@ -103,10 +103,9 @@ def one_hot_encoding(df:pd.DataFrame):
 # Combine everything into one function to process features dataframe
 def preprocessing(df:pd.DataFrame):
     df["months_since_earliest_cr"] = compute_months(df, "issue_d", "earliest_cr_line")
-    df = remove_columns(df)
     df = map_categorical_variables(df, state_to_region, sub_grade_to_risk, emp_length_to_int)
+    df = remove_columns(df)
     df = imputation(df)
     df = one_hot_encoding(df)
-    # Drop anyremaining missing values
-    df = df.dropna()
+    
     return df
