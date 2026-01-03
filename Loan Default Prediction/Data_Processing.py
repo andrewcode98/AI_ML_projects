@@ -56,7 +56,7 @@ def remove_columns(df:pd.DataFrame, thresh:float = 0.7) -> pd.DataFrame:
                  'collection_recovery_fee', 'last_pymnt_amnt', 'last_credit_pull_d',
                  'last_fico_range_high', 'last_fico_range_low']
     extra_columns_to_remove = [col for col in df.columns if col.startswith("hardship") or "settlement" in col] + \
-            ["id", "emp_title", "url", "title", "zip_code", "policy_code", "earliest_cr_line"]
+            ["id", "emp_title", "url", "title", "zip_code", "policy_code", "earliest_cr_line", "desc", "initial_list_status"]
     df = df.drop(columns = missing_cols + lf_columns + extra_columns_to_remove)
     return df
 
@@ -107,5 +107,6 @@ def preprocessing(df:pd.DataFrame):
     df = remove_columns(df)
     df = imputation(df)
     df = one_hot_encoding(df)
+    df = df.fillna(0)
     
     return df
